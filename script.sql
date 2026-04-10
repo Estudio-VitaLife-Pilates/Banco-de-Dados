@@ -1,5 +1,7 @@
-CREATE DATABASE IF NOT EXISTS pilates;
+DROP DATABASE IF EXISTS pilates;
+CREATE DATABASE pilates;
 USE pilates;
+
 CREATE TABLE professor (
     id_professor INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -38,7 +40,7 @@ CREATE TABLE aluno_plano (
 
 CREATE TABLE turma (
     id_turma INT AUTO_INCREMENT PRIMARY KEY,
-    dia_semana ENUM('SEGUNDA','TERCA','QUARTA','QUINTA','SEXTA','SABADO','DOMINGO') NOT NULL,
+    dia_semana VARCHAR(20) NOT NULL,
     hora_inicio TIME NOT NULL,
     duracao_minutos INT DEFAULT 60,
     capacidade_max INT,
@@ -61,7 +63,7 @@ CREATE TABLE aula (
     id_aula INT AUTO_INCREMENT PRIMARY KEY,
     fk_turma INT,
     data_aula DATE NOT NULL,
-    status ENUM('MARCADA','CANCELADA') DEFAULT 'MARCADA',
+    marcada BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (fk_turma) REFERENCES turma(id_turma)
 );
 
@@ -69,20 +71,11 @@ CREATE TABLE aula_aluno (
     id_aula_aluno INT AUTO_INCREMENT PRIMARY KEY,
     fk_aula INT,
     fk_aluno INT,
-    status ENUM('AGENDADO','AUSENTE','CANCELADO','REPOSICAO') DEFAULT 'AGENDADO',
+    status VARCHAR(20) DEFAULT 'AGENDADO',
+    fk_aula_origem INT NULL,
     FOREIGN KEY (fk_aula) REFERENCES aula(id_aula),
-    FOREIGN KEY (fk_aluno) REFERENCES aluno(id_aluno)
-);
-
-CREATE TABLE reposicao (
-    id_reposicao INT AUTO_INCREMENT PRIMARY KEY,
-    fk_aluno INT,
-    fk_aula_origem INT,
-    fk_aula_destino INT,
-    status ENUM('AGENDADA','REALIZADA','CANCELADA') DEFAULT 'AGENDADA',
     FOREIGN KEY (fk_aluno) REFERENCES aluno(id_aluno),
-    FOREIGN KEY (fk_aula_origem) REFERENCES aula(id_aula),
-    FOREIGN KEY (fk_aula_destino) REFERENCES aula(id_aula)
+    FOREIGN KEY (fk_aula_origem) REFERENCES aula(id_aula)
 );
 
 INSERT INTO professor (nome, telefone, email)
@@ -113,42 +106,34 @@ VALUES (1,1,'2026-03-01'),(1,2,'2026-03-01');
 INSERT INTO aula (fk_turma,data_aula)
 VALUES
 (1,'2026-03-02'),(1,'2026-03-09'),(1,'2026-03-16'),(1,'2026-03-23'),(1,'2026-03-30'),
-(2,'2026-03-04'),(2,'2026-03-11'),(2,'2026-03-18'),(2,'2026-03-25');
+(2,'2026-03-04'),(2,'2026-03-11'),(2,'2026-03-18'),(2,'2026-03-25'),
+(3,'2026-03-14');
 
 INSERT INTO aula_aluno (fk_aula,fk_aluno,status)
-VALUES 
-(1,1,'AUSENTE'),(2,1,'AUSENTE'),
-(3,1,'AGENDADO'),(4,1,'AGENDADO'),(5,1,'AGENDADO'),
-(6,1,'AGENDADO'),(7,1,'AGENDADO'),(8,1,'AGENDADO'),(9,1,'AGENDADO');
+VALUES
+(1,1,'AUSENTE'), (2,1,'AUSENTE'), (3,1,'AGENDADO'), (4,1,'AGENDADO'),
+(5,1,'AGENDADO'), (6,1,'AGENDADO'), (7,1,'AGENDADO'), (8,1,'AGENDADO'),
+(9,1,'AGENDADO'), (10,1,'REPOSICAO'), (6,1,'REPOSICAO');
 
-INSERT INTO aula (fk_turma,data_aula)
-VALUES (3,'2026-03-14');
-
-INSERT INTO reposicao (fk_aluno,fk_aula_origem,fk_aula_destino)
-VALUES (
-    1,
-    1,
-    (SELECT id_aula FROM aula ORDER BY id_aula DESC LIMIT 1)
-);
-
-SELECT aluno.nome, dia_semana, hora_inicio
+SELECT aluno.nome, turma.dia_semana, turma.hora_inicio
 FROM aluno_turma
 INNER JOIN aluno ON fk_aluno = id_aluno
 INNER JOIN turma ON fk_turma = id_turma
 WHERE id_turma = 1;
 
-SELECT * 
+SELECT *
 FROM aula
 INNER JOIN aula_aluno ON id_aula = fk_aula
 INNER JOIN aluno ON fk_aluno = id_aluno;
 
 SELECT
-    a1.data_aula AS aula_faltada,
-    a2.data_aula AS aula_reposicao,
-    r.status
-FROM reposicao r
-JOIN aula a1 ON r.fk_aula_origem = a1.id_aula
-JOIN aula a2 ON r.fk_aula_destino = a2.id_aula
-WHERE r.fk_aluno = 1
-AND a2.data_aula BETWEEN '2026-03-01' AND '2026-03-31'
-ORDER BY a2.data_aula;
+    a_origem.data_aula AS aula_faltada,
+    a_destino.data_aula AS aula_reposicao,
+    aa.status
+FROM aula_aluno aa
+JOIN aula a_destino ON aa.fk_aula = a_destino.id_aula
+LEFT JOIN aula a_origem ON aa.fk_aula_origem = a_origem.id_aula
+WHERE aa.fk_aluno = 1
+AND aa.status = 'REPOSICAO'
+AND a_destino.data_aula BETWEEN '2026-03-01' AND '2026-03-31'
+ORDER BY a_destino.data_aula;
