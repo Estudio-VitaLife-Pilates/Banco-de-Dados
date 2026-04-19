@@ -2,6 +2,13 @@ DROP DATABASE IF EXISTS pilates;
 CREATE DATABASE pilates;
 USE pilates;
 
+CREATE TABLE usuario (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    senha VARCHAR(100) NOT NULL
+);
+
 CREATE TABLE professor (
     id_professor INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -25,7 +32,8 @@ CREATE TABLE plano (
     id_plano INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(50),
     frequencia_semanal INT,
-    validade_dias INT
+    validade_dias INT,
+    valor_mensal DECIMAL(8,2)
 );
 
 CREATE TABLE aluno_plano (
@@ -86,10 +94,10 @@ VALUES
 ('Bruno Silva','11999990000','12345678901','bruno@email.com','2003-04-12','2026-03-01'),
 ('Isabella Chagas','11988881111','98765432100','ana@email.com','2002-09-17','2026-03-01');
 
-INSERT INTO plano (nome, frequencia_semanal, validade_dias)
+INSERT INTO plano (nome, frequencia_semanal, validade_dias, valor_mensal)
 VALUES
-('2x por semana',2,30),
-('3x por semana',3,30);
+('2x por semana',2,30,290.10),
+('3x por semana',3,30,390.10);
 
 INSERT INTO turma (dia_semana, hora_inicio, capacidade_max, fk_professor)
 VALUES
