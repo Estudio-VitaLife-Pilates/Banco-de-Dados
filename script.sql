@@ -23,6 +23,7 @@ CREATE TABLE aluno (
                        telefone VARCHAR(20),
                        cpf VARCHAR(11) UNIQUE,
                        email VARCHAR(100),
+                       ficha_anamnese VARCHAR(255),
                        ativo BOOLEAN DEFAULT TRUE,
                        data_nascimento DATE,
                        data_cadastro DATE
@@ -88,10 +89,10 @@ CREATE TABLE aula_aluno (
 INSERT INTO professor (nome, telefone, email)
 VALUES ('Thais Almeida','11988887777','thais@pilates.com');
 
-INSERT INTO aluno (nome, telefone, cpf, email, data_nascimento, data_cadastro)
+INSERT INTO aluno (nome, telefone, cpf, email, data_nascimento, data_cadastro, ficha_anamnese)
 VALUES
-    ('Bruno Silva','11999990000','12345678901','bruno@email.com','2003-04-12','2026-03-01'),
-    ('Isabella Chagas','11988881111','98765432100','ana@email.com','2002-09-17','2026-03-01');
+    ('Bruno Silva','11999990000','12345678901','bruno@email.com','2003-04-12','2026-03-01', 'aa'),
+    ('Isabella Chagas','11988881111','98765432100','ana@email.com','2002-09-17','2026-03-01', 'aa');
 
 INSERT INTO plano (nome, frequencia_semanal, validade_dias, valor_mensal)
 VALUES
