@@ -43,6 +43,7 @@ CREATE TABLE aluno_plano (
                              plano_id INT,
                              data_inicio DATE,
                              data_fim DATE,
+                             ativo BOOLEAN DEFAULT TRUE,
                              FOREIGN KEY (aluno_id) REFERENCES aluno(id),
                              FOREIGN KEY (plano_id) REFERENCES plano(id)
 );
